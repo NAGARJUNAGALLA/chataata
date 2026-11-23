@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>WhatsApp Mobile Clone</title>
+  <style>
+- {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #111b21;
+    }
+
+    /* === PASSCODE LOCK SCREEN === */
+    .lock-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: #111b21;
+      color: #e9edef;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 48px 24px 36px;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .lock-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .lock-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .lock-badge {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(0, 168, 132, 0.16);
+      color: #00a884;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .lock-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .lock-subtitle {
+      font-size: 0.88rem;
+      color: #8696a0;
+      margin-bottom: 26px;
+    }
+
+    .pin-dots {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .pin-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #8696a0;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .pin-dot.filled {
+      background: #00a884;
+      border-color: #00a884;
+      transform: scale(1.1);
+    }
+
+    .pin-dot.error {
+      background: #f15c6d;
+      border-color: #f15c6d;
+    }
+
+    .lock-error {
+      height: 20px;
+      font-size: 0.84rem;
+      color: #f15c6d;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .shake {
+      animation: shake 0.32s ease;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 74px);
+      gap: 16px 24px;
+      justify-content: center;
+    }
+
+    .key-btn {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      border: none;
+      background: #202c33;
+      color: #e9edef;
+      font-size: 1.55rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.12s ease, transform 0.1s ease;
+      user-select: none;
+    }
+
+    .key-btn:active {
+      background: #2a3942;
+      transform: scale(0.94);
+    }
+
+    .key-btn.action {
+      background: transparent;
+      font-size: 0.9rem;
+      color: #8696a0;
+    }
+
+    /* === WHATSAPP MOBILE APP === */
+    .app {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background-color: #efeae2;
+      background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+      background-size: 18px 18px;
+    }
+
+    .header {
+      background: #008069;
+      color: #ffffff;
+      height: 58px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #dfe5e7;
+      color: #54656f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .chat-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .chat-title {
+      font-size: 1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-status {
+      font-size: 0.74rem;
+      color: #d9f3ee;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .name-input {
+      background: rgba(255, 255, 255, 0.18);
+      border: none;
+      color: #ffffff;
+      padding: 5px 10px;
+      border-radius: 14px;
+      width: 96px;
+      font-size: 0.82rem;
+      outline: none;
+    }
+    .name-input::placeholder { color: #d9f3ee; }
+
+    .chat {
+      flex: 1;
+      padding: 12px 10px 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .msg {
+      position: relative;
+      max-width: 82%;
+      padding: 7px 10px 6px;
+      border-radius: 10px;
+      font-size: 0.94rem;
+      line-height: 1.38;
+      word-wrap: break-word;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.13);
+    }
+
+    .msg.received {
+      align-self: flex-start;
+      background: #ffffff;
+      border-top-left-radius: 2px;
+    }
+
+    .msg.sent {
+      align-self: flex-end;
+      background: #d9fdd3;
+      border-top-right-radius: 2px;
+    }
+
+    .msg.has-media {
+      width: min(82%, 420px);
+    }
+
+    .sender {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #008069;
+      margin-bottom: 2px;
+    }
+
+    .msg-text a {
+      color: #027eb5;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .msg-text a:hover { text-decoration: underline; }
+
+    .yt-box {
+      margin-top: 6px;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000000;
+    }
+    .yt-box iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .msg-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 4px;
+      margin-top: 3px;
+    }
+
+    .time {
+      font-size: 0.67rem;
+      color: #667781;
+    }
+
+    .ticks {
+      font-size: 0.75rem;
+      color: #53bdeb;
+      line-height: 1;
+    }
+
+    .input-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: transparent;
+      flex-shrink: 0;
+    }
+
+    .input-pill {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 6px 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+      gap: 8px;
+    }
+
+    .pill-icon {
+      color: #54656f;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .input-pill input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 0.96rem;
+      padding: 6px 2px;
+      background: transparent;
+      color: #111b21;
+    }
+
+    .send-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: none;
+      background: #00a884;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+    }
+    .send-btn:active { transform: scale(0.95); }
+    .send-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <!-- PASSCODE LOCK SCREEN -->
+  <div id="lockScreen" class="lock-screen">
+    <div class="lock-top">
+      <div class="lock-badge">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      </div>
+      <div class="lock-title">Chat Locked</div>
+      <div class="lock-subtitle">Enter passcode to open messages</div>
+      <div id="pinDots" class="pin-dots"></div>
+      <div id="lockError" class="lock-error"></div>
+    </div>
+
+    <div class="keypad" id="keypad">
+      <button type="button" class="key-btn" data-key="1">1</button>
+      <button type="button" class="key-btn" data-key="2">2</button>
+      <button type="button" class="key-btn" data-key="3">3</button>
+      <button type="button" class="key-btn" data-key="4">4</button>
+      <button type="button" class="key-btn" data-key="5">5</button>
+      <button type="button" class="key-btn" data-key="6">6</button>
+      <button type="button" class="key-btn" data-key="7">7</button>
+      <button type="button" class="key-btn" data-key="8">8</button>
+      <button type="button" class="key-btn" data-key="9">9</button>
+      <button type="button" class="key-btn action" data-key="clear">Clear</button>
+      <button type="button" class="key-btn" data-key="0">0</button>
+      <button type="button" class="key-btn action" data-key="back" aria-label="Backspace">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+          <line x1="18" y1="9" x2="12" y2="15" />
+          <line x1="12" y1="9" x2="18" y2="15" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- WHATSAPP MOBILE UI -->
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button class="icon-btn" type="button" aria-label="Back">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div class="avatar">G</div>
+        <div class="chat-meta">
+          <div class="chat-title">Group Chat</div>
+          <div class="chat-status">online</div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <input id="username" class="name-input" type="text" placeholder="Your name" value="Alex" />
+        <button id="lockBtn" class="icon-btn" type="button" title="Lock chat" aria-label="Lock chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="chat" class="chat"></main>
+
+    <form id="chatForm" class="input-bar">
+      <div class="input-pill">
+        <span class="pill-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+            <line x1="9" y1="9" x2="9.01" y2="9" />
+            <line x1="15" y1="9" x2="15.01" y2="9" />
+          </svg>
+        </span>
+        <input id="msgInput" type="text" placeholder="Message" autocomplete="off" required />
+      </div>
+
+      <button id="sendBtn" class="send-btn" type="submit" aria-label="Send">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <script>
+    // === REPLACE THESE WITH YOUR OWN VALUES ===
+    const CONFIG = {
+      PASSCODE: "1988",                   // Numeric passcode (any length)
+      FORM_ID: "1FAIpQLSeesL-clpqKrzp30aD4l9lMy7iQCfYteVrGxwxHiicHbTbojQ",
+      ENTRY_USER: "entry.2105138594",
+      ENTRY_MSG: "entry.1510662603",
+      SHEET_ID: "1FITRE7qnsBb84siW25_RjfqdWd32G66r6Xjpl8OwMYY",
+      POLL_MS: 3000
+    };
+
+    const lockScreen = document.getElementById("lockScreen");
+    const pinDotsEl = document.getElementById("pinDots");
+    const lockErrorEl = document.getElementById("lockError");
+    const keypadEl = document.getElementById("keypad");
+    const lockBtn = document.getElementById("lockBtn");
+
+    const chatEl = document.getElementById("chat");
+    const formEl = document.getElementById("chatForm");
+    const msgInput = document.getElementById("msgInput");
+    const userInput = document.getElementById("username");
+    const sendBtn = document.getElementById("sendBtn");
+
+    let enteredPin = "";
+    let isUnlocked = false;
+    let renderedCount = 0;
+    let pollTimer = null;
+
+    // Build PIN dots dynamically to match CONFIG.PASSCODE length
+    function renderPinDots(isError = false) {
+      pinDotsEl.innerHTML = "";
+      for (let i = 0; i < CONFIG.PASSCODE.length; i++) {
+        const dot = document.createElement("div");
+        dot.className = "pin-dot";
+        if (i < enteredPin.length) dot.classList.add(isError ? "error" : "filled");
+        pinDotsEl.appendChild(dot);
+      }
+    }
+
+    function unlockApp() {
+      isUnlocked = true;
+      enteredPin = "";
+      lockErrorEl.textContent = "";
+      lockScreen.classList.add("hidden");
+      fetchMessages();
+      if (!pollTimer) {
+        pollTimer = setInterval(fetchMessages, CONFIG.POLL_MS);
+      }
+    }
+
+    function lockApp() {
+      isUnlocked = false;
+      enteredPin = "";
+      lockErrorEl.textContent = "";
+      renderPinDots();
+      lockScreen.classList.remove("hidden");
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    }
+
+    function handleKey(key) {
+      if (isUnlocked) return;
+      lockErrorEl.textContent = "";
+
+      if (key === "clear") {
+        enteredPin = "";
+      } else if (key === "back") {
+        enteredPin = enteredPin.slice(0, -1);
+      } else if (/^\d$/.test(key) && enteredPin.length < CONFIG.PASSCODE.length) {
+        enteredPin += key;
+      }
+
+      renderPinDots();
+
+      if (enteredPin.length === CONFIG.PASSCODE.length) {
+        if (enteredPin === CONFIG.PASSCODE) {
+          setTimeout(unlockApp, 120);
+        } else {
+          renderPinDots(true);
+          lockErrorEl.textContent = "Incorrect passcode";
+          pinDotsEl.classList.remove("shake");
+          void pinDotsEl.offsetWidth; // Restart animation
+          pinDotsEl.classList.add("shake");
+          setTimeout(() => {
+            enteredPin = "";
+            renderPinDots();
+          }, 420);
+        }
+      }
+    }
+
+    keypadEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-key]");
+      if (btn) handleKey(btn.dataset.key);
+    });
+
+    // Support physical keyboard input while locked
+    document.addEventListener("keydown", (e) => {
+      if (isUnlocked) return;
+      if (/^\d$/.test(e.key)) handleKey(e.key);
+      else if (e.key === "Backspace") handleKey("back");
+      else if (e.key === "Escape") handleKey("clear");
+    });
+
+    lockBtn.addEventListener("click", lockApp);
+
+    // === CHAT LOGIC ===
+    function getYouTubeId(text) {
+      const match = text.match(
+        /(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i
+      );
+      return match ? match[1] : null;
+    }
+
+    function buildMessageText(text) {
+      const container = document.createElement("div");
+      container.className = "msg-text";
+      const parts = text.split(/(https?:\/\/[^\s]+)/g);
+
+      parts.forEach((part) => {
+        if (/^https?:\/\/[^\s]+$/.test(part)) {
+          const link = document.createElement("a");
+          link.href = part;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = part;
+          container.appendChild(link);
+        } else if (part) {
+          container.appendChild(document.createTextNode(part));
+        }
+      });
+
+      return container;
+    }
+
+    async function fetchMessages() {
+      if (!isUnlocked) return;
+      const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&t=${Date.now()}`;
+
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
+        const rows = json.table?.rows || [];
+
+        if (rows.length <= renderedCount) return;
+
+        const currentUser = userInput.value.trim().toLowerCase();
+
+        for (let i = renderedCount; i < rows.length; i++) {
+          const cells = rows[i].c;
+          if (!cells) continue;
+
+          const timestamp = cells[0]?.f || "";
+          const sender = cells[1]?.v || "Anonymous";
+          const message = String(cells[2]?.v || "");
+
+          appendMessage(sender, message, timestamp, sender.trim().toLowerCase() === currentUser);
+        }
+
+        renderedCount = rows.length;
+        chatEl.scrollTop = chatEl.scrollHeight;
+      } catch (err) {
+        console.error("Failed to fetch sheet:", err);
+      }
+    }
+
+    function appendMessage(sender, text, timestamp, isMine) {
+      const ytId = getYouTubeId(text);
+      const bubble = document.createElement("div");
+      bubble.className = `msg ${isMine ? "sent" : "received"}${ytId ? " has-media" : ""}`;
+
+      if (!isMine) {
+        const senderEl = document.createElement("div");
+        senderEl.className = "sender";
+        senderEl.textContent = sender;
+        bubble.appendChild(senderEl);
+      }
+
+      bubble.appendChild(buildMessageText(text));
+
+      if (ytId) {
+        const ytBox = document.createElement("div");
+        ytBox.className = "yt-box";
+
+        const iframe = document.createElement("iframe");
+        iframe.src = `https://www.youtube.com/embed/${ytId}`;
+        iframe.title = "YouTube video player";
+        iframe.loading = "lazy";
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iframe.allowFullscreen = true;
+
+        ytBox.appendChild(iframe);
+        bubble.appendChild(ytBox);
+      }
+
+      const footer = document.createElement("div");
+      footer.className = "msg-footer";
+
+      const timeEl = document.createElement("span");
+      timeEl.className = "time";
+      timeEl.textContent = timestamp.includes(" ") ? timestamp.split(" ")[1] : timestamp;
+      footer.appendChild(timeEl);
+
+      if (isMine) {
+        const ticks = document.createElement("span");
+        ticks.className = "ticks";
+        ticks.textContent = "✓✓";
+        footer.appendChild(ticks);
+      }
+
+      bubble.appendChild(footer);
+      chatEl.appendChild(bubble);
+    }
+
+    formEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isUnlocked) return;
+
+      const sender = userInput.value.trim() || "Anonymous";
+      const message = msgInput.value.trim();
+      if (!message) return;
+
+      sendBtn.disabled = true;
+      msgInput.value = "";
+
+      const body = new URLSearchParams();
+      body.append(CONFIG.ENTRY_USER, sender);
+      body.append(CONFIG.ENTRY_MSG, message);
+
+      try {
+        await fetch(`https://docs.google.com/forms/d/e/${CONFIG.FORM_ID}/formResponse`, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: body.toString()
+        });
+
+        setTimeout(fetchMessages, 1000);
+      } catch (err) {
+        console.error("Failed to send message:", err);
+      } finally {
+        sendBtn.disabled = false;
+        msgInput.focus();
+      }
+    });
+
+    userInput.addEventListener("change", () => {
+      if (!isUnlocked) return;
+      chatEl.innerHTML = "";
+      renderedCount = 0;
+      fetchMessages();
+    });
+
+    // Initialize lock screen on load
+    renderPinDots();
+  </script>
+</body>
+</html>
+
+Make this to support to blogger theme
