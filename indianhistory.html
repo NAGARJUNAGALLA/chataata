@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chronological List of Indian Kingdoms & Empires</title>
+  <style>
+    :root {
+      --bg-color: #faf7f2;
+      --card-bg: #ffffff;
+      --primary: #8b2635;
+      --primary-hover: #6d1c28;
+      --accent: #d97706;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --border: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+      border-left: 3px solid var(--primary);
+    }
+
+    .kingdom-card {
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .kingdom-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .kingdom-card::before {
+      content: "";
+      position: absolute;
+      left: -2.55rem;
+      top: 1.5rem;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 3px solid var(--bg-color);
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+
+    .era-badge {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      margin-bottom: 0.4rem;
+    }
+
+    .kingdom-card h2 {
+      font-size: 1.3rem;
+      color: var(--text-main);
+      margin-bottom: 0.35rem;
+    }
+
+    .kingdom-meta {
+      font-size: 0.9rem;
+      color: var(--primary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .kingdom-card p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    /* Footer Action Area */
+    .action-section {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 2px solid var(--border);
+    }
+
+    .open-modal-btn {
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 0.9rem 2rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(139, 38, 53, 0.25);
+      transition: background-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .open-modal-btn:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Full-Screen Popup Modal */
+    .fullscreen-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(17, 24, 39, 0.96);
+      z-index: 9999;
+      flex-direction: column;
+    }
+
+    .fullscreen-modal.active {
+      display: flex;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background-color: #111827;
+      color: #f9fafb;
+      border-bottom: 1px solid #374151;
+    }
+
+    .modal-header span {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: 1px solid #4b5563;
+      color: #ffffff;
+      font-size: 1.5rem;
+      line-height: 1;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .close-btn:hover {
+      background-color: #dc2626;
+      border-color: #dc2626;
+    }
+
+    .modal-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Major Indian Kingdoms & Empires</h1>
+      <p>A chronological overview from Ancient Mahajanapadas to the Modern Era</p>
+    </header>
+
+    <main class="timeline">
+      <article class="kingdom-card">
+        <span class="era-badge">c. 600 BCE – 345 BCE</span>
+        <h2>1. Sixteen Mahajanapadas & Nanda Empire</h2>
+        <div class="kingdom-meta">Region: Indo-Gangetic Plain | Key Rulers: Bimbisara, Ajatashatru, Mahapadma Nanda</div>
+        <p>The rise of urban states across northern India, culminating in Magadha's dominance under the Haryanka, Shishunaga, and Nanda dynasties.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">322 BCE – 185 BCE</span>
+        <h2>2. Maurya Empire</h2>
+        <div class="kingdom-meta">Region: Pan-Indian Subcontinent | Key Rulers: Chandragupta Maurya, Bindusara, Ashoka</div>
+        <p>First empire to unify most of the Indian subcontinent, renowned for Arthashastra administration and Ashoka's spread of Buddhism.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">c. 300 BCE – 1279 CE</span>
+        <h2>3. Sangam Dynasties (Chera, Chola, Pandya)</h2>
+        <div class="kingdom-meta">Region: Southern India (Tamilakam) | Key Rulers: Karikala Chola, Nedunjeliyan, Rajaraja I, Rajendra I</div>
+        <p>Three ancient Tamil dynasties flourishing from the Sangam period, later evolving into medieval maritime superpowers under the Imperial Cholas.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">c. 1st Century BCE – 220 CE</span>
+        <h2>4. Satavahana Dynasty</h2>
+        <div class="kingdom-meta">Region: Deccan Plateau | Key Rulers: Gautamiputra Satakarni, Vashishthiputra Pulumavi</div>
+        <p>Dominant Deccan power acting as a cultural and trade bridge between North and South India, noted for Amaravati art and maritime commerce.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">c. 30 CE – 375 CE</span>
+        <h2>5. Kushan Empire</h2>
+        <div class="kingdom-meta">Region: Northern & Northwestern India | Key Rulers: Kujula Kadphises, Kanishka the Great</div>
+        <p>Controlled key Silk Road routes, fostering Gandhara and Mathura schools of art and the spread of Mahayana Buddhism into Central Asia.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">c. 319 CE – 550 CE</span>
+        <h2>6. Gupta Empire</h2>
+        <div class="kingdom-meta">Region: Northern & Central India | Key Rulers: Chandragupta I, Samudragupta, Chandragupta II</div>
+        <p>Widely regarded as the Golden Age of India for breakthroughs in mathematics, astronomy, Sanskrit literature, and temple architecture.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">543 CE – 753 CE & 973 CE – 1189 CE</span>
+        <h2>7. Chalukya Dynasties (Badami & Kalyani)</h2>
+        <div class="kingdom-meta">Region: Karnataka & Deccan | Key Rulers: Pulakeshin II, Vikramaditya VI</div>
+        <p>Pioneers of Vesara temple architecture at Badami, Aihole, and Pattadakal, successfully checking northern expansion into the Deccan.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">275 CE – 897 CE</span>
+        <h2>8. Pallava Dynasty</h2>
+        <div class="kingdom-meta">Region: Northern Tamil Nadu & Southern Andhra | Key Rulers: Mahendravarman I, Narasimhavarman I</div>
+        <p>Renowned patrons of Dravidian rock-cut and structural architecture, exemplified by the shore temples and monuments of Mahabalipuram.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">750 CE – 1161 CE</span>
+        <h2>9. Pala Empire</h2>
+        <div class="kingdom-meta">Region: Bengal & Bihar | Key Rulers: Gopala, Dharmapala, Devapala</div>
+        <p>Major patrons of Mahayana and Vajrayana Buddhism, establishing renowned monastic universities at Vikramashila and supporting Nalanda.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">753 CE – 982 CE</span>
+        <h2>10. Rashtrakuta Dynasty</h2>
+        <div class="kingdom-meta">Region: Deccan & Central India | Key Rulers: Dantidurga, Dhruva, Amoghavarsha I</div>
+        <p>Dominated the Tripartite Struggle for Kannauj and commissioned the monolithic Kailasa Temple at Ellora.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">1206 CE – 1526 CE</span>
+        <h2>11. Delhi Sultanate</h2>
+        <div class="kingdom-meta">Region: Northern & Central India | Dynasties: Mamluk, Khalji, Tughlaq, Sayyid, Lodi</div>
+        <p>Introduced Indo-Islamic architecture and centralized military-administrative systems while defending the subcontinent against Mongol invasions.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">1336 CE – 1646 CE</span>
+        <h2>12. Vijayanagara Empire</h2>
+        <div class="kingdom-meta">Region: Southern India | Key Rulers: Harihara I, Bukka Raya I, Krishnadevaraya</div>
+        <p>Centered at Hampi, the empire served as a wealthy bastion of South Indian arts, Telugu/Kannada/Tamil literature, and temple building.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">1526 CE – 1857 CE</span>
+        <h2>13. Mughal Empire</h2>
+        <div class="kingdom-meta">Region: Almost Entire Indian Subcontinent | Key Rulers: Babur, Akbar, Shah Jahan, Aurangzeb</div>
+        <p>Unified vast territories with centralized revenue systems and left an enduring architectural legacy including the Taj Mahal and Red Fort.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">1674 CE – 1818 CE</span>
+        <h2>14. Maratha Empire</h2>
+        <div class="kingdom-meta">Region: Deccan, Central & Northern India | Key Rulers: Chhatrapati Shivaji Maharaj, Peshwa Bajirao I</div>
+        <p>Rose from the Western Ghats using agile guerrilla warfare and naval power to become the dominant Indian confederacy in the 18th century.</p>
+      </article>
+
+      <article class="kingdom-card">
+        <span class="era-badge">1799 CE – 1849 CE</span>
+        <h2>15. Sikh Empire</h2>
+        <div class="kingdom-meta">Region: Punjab & Northwestern Subcontinent | Key Rulers: Maharaja Ranjit Singh</div>
+        <p>Consolidated the Sikh Misls into a powerful secular kingdom stretching from the Sutlej River to the Khyber Pass.</p>
+      </article>
+    </main>
+
+    <!-- Button at the end -->
+    <div class="action-section">
+      <button class="open-modal-btn" id="openPopupBtn">Explore Full Timeline Reference</button>
+    </div>
+  </div>
+
+  <!-- Full Screen Popup Modal -->
+  <div class="fullscreen-modal" id="fullscreenPopup" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <span id="modalTitle">Wikipedia: History of India & Kingdoms Reference</span>
+      <button class="close-btn" id="closePopupBtn" aria-label="Close full screen popup">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Replace src URL with any desired link -->
+      <iframe src="https://nagarjunagalla.github.io/chataata" title="External Reference Link"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const openBtn = document.getElementById('openPopupBtn');
+    const closeBtn = document.getElementById('closePopupBtn');
+    const modal = document.getElementById('fullscreenPopup');
+
+    openBtn.addEventListener('click', () => {
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    });
+
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+
+    // Also allow closing with the Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+  </script>
+
+</body>
+</html>
